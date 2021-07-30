@@ -1,0 +1,93 @@
+name: $(Build.DefinitionName)_$(Build.BuildId)_$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+    branches:
+        include:
+            - master
+
+pool: ubuntu-18
+
+stages:
+    - stage: test
+      displayName: 'Test Pipeline'
+      jobs:
+          - job: build
+            displayName: 'Pre-Requisites'
+            steps:
+                - task: GoTool@0
+                  displayName: 'Installing Go'
+                  inputs:
+                      version: '1.15.6'
+                - task: Go@0
+                  displayName: 'Getting Go packages'
+                  inputs:
+                      command: 'get'
+                      arguments: '-d'
+                      workingDirectory: '$(Build.SourcesDirectory)'
+                - task: Go@0
+                  displayName: 'Set Linux Go Environment Vars'
+                  inputs:
+                      command: 'custom'
+                      customCommand: 'env'
+                      arguments: '-w GOOS=linux GOARCH=amd64'
+                      workingDirectory: '$(Build.SourcesDirectory)'
+                - task: Go@0
+                  displayName: 'Build Linux'
+                  inputs:
+                      command: 'build'
+                      workingDirectory: '$(Build.SourcesDirectory)'
+                - task: CopyFiles@2
+                  displayName: Copy Linux Build
+                  inputs:
+                      SourceFolder: '$(Build.SourcesDirectory)'
+                      Contents: 'DeploymentTools'
+                      TargetFolder: '$(Build.ArtifactStagingDirectory)/DeploymentTools/linux/amd64'
+                - task: PublishBuildArtifacts@1
+                  displayName: Create Linux Artifact
+                  inputs:
+                      PathtoPublish: '$(Build.ArtifactStagingDirectory)/DeploymentTools/linux/amd64'
+                      artifactName: drop_linux
+                - task: Go@0
+                  displayName: 'Set Windows Go Environment Vars'
+                  inputs:
+                      command: 'custom'
+                      customCommand: 'env'
+                      arguments: '-w GOOS=windows GOARCH=amd64'
+                      workingDirectory: '$(Build.SourcesDirectory)'
+                - task: Go@0
+                  displayName: 'Build Windows'
+                  inputs:
+                      command: 'build'
+                      workingDirectory: '$(Build.SourcesDirectory)'
+                - task: CopyFiles@2
+                  displayName: Copy Windows Build
+                  inputs:
+                      SourceFolder: '$(Build.SourcesDirectory)'
+                      Contents: 'DeploymentTools.exe'
+                      TargetFolder: '$(Build.ArtifactStagingDirectory)/DeploymentTools/windows/amd64'
+                - task: PublishBuildArtifacts@1
+                  displayName: Create Windows Artifact
+                  inputs:
+                      PathtoPublish: '$(Build.ArtifactStagingDirectory)/DeploymentTools/windows/amd64'
+                      artifactName: drop_windows
+          - job:
+            displayName: 'Run Linux'
+            dependsOn: build
+            steps:
+                - task: DownloadBuildArtifacts@0
+                  displayName: Downloading Linux Artifact
+                  inputs:
+                      artifactName: drop_linux
+                      downloadPath: $(Build.SourcesDirectory)/bin
+                - bash: |
+                      ls -la $(Build.SourcesDirectory)/bin/drop_linux
+                      chmod 777 $(Build.SourcesDirectory)/bin/drop_linux/DeploymentTools
+                      cd $(Build.SourcesDirectory)/bin/drop_linux
+                      ./DeploymentTools
+                  displayName: SetPermissions
+                  workingDirectory: $(Build.SourcesDirectory)
+                  env:
+                      debug: true
+                      ARM_CLIENT_ID: 6e4bc37d-77e3-4795-8fd7-997056845376
+                      ARM_CLIENT_SECRET: NIMDqtHx_ZlgXj4xyiwsFGssO~T0uXMDmI
+                      ARM_TENANT_ID: e5208e76-dd12-47f0-9541-c9b45afaffe6

@@ -1,0 +1,44 @@
+---
+azure:
+  subscriptionId: e7ebda2e-82c4-458f-8ce7-47677990870e
+  resourceGroup: carlos-uno
+  serviceBus:
+    namespace: carlos-uno-bus
+    topics:
+    - terraformModule: servicebus_topics
+      name: aaa-gmt
+      subscriptions:
+      - terraformModule: servicebus_topics_subscriptions
+        name: to-egs-dmt
+    - terraformModule: servicebus_topics
+      name: egs-dmt
+      subscriptions:
+      - terraformModule: servicebus_topics_subscriptions
+        name: to-egs-smt-ttime
+        rules:
+        - terraformModule: servicebus_topics_subscriptions_rules
+          name: 608945df6b9a7372881767fda5311c99c381670a
+      - terraformModule: servicebus_topics_subscriptions
+        name: to-egs-smt-webhost
+        rules:
+        - terraformModule: servicebus_topics_subscriptions_rules
+          name: 9057cf5bad990c66ac0bbbb44332f2b03339be30
+    - terraformModule: servicebus_topics
+      name: egs-smt-ttime
+      subscriptions:
+      - terraformModule: servicebus_topics_subscriptions
+        name: egs-smt-ttime-sub
+    - terraformModule: servicebus_topics
+      name: egs-smt-webhost
+      subscriptions:
+      - terraformModule: servicebus_topics_subscriptions
+        name: egs-smt-webhost-sub
+    - terraformModule: servicebus_topics
+      name: sample.telltime
+    - terraformModule: servicebus_topics
+      name: sample.timepassed
+    queues:
+    - terraformModule: servicebus_queues
+      name: sample.telltime.command
+    - terraformModule: servicebus_queues
+      name: sample.timepassed.command

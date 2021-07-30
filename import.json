@@ -1,0 +1,87 @@
+{
+    "azure": {
+        "subscriptionId": "{{ variable.azureSubscriptionId }}",
+        "resourceGroup": "carlos-uno",
+        "testNumber": 10,
+        "testBoolean": true,
+        "serviceBus": {
+            "namespace": "carlos-uno-bus",
+            "topics": [
+                {
+                    "terraformModule": "{{ should.bethis }}",
+                    "name": "{{ also good }}",
+                    "subscriptions": [
+                        {
+                            "terraformModule": "{{ var.test }}",
+                            "name": "{{ file.azure.serviceBus.topics[0].name}}"
+                        }
+                    ]
+                },
+                {
+                    "terraformModule": "{{file.azure.subscriptionId}}",
+                    "name": "egs-dmt",
+                    "subscriptions": [
+                        {
+                            "terraformModule": "{{ var.terraformModule }}",
+                            "name": "to-egs-smt-ttime",
+                            "rules": [
+                                {
+                                    "terraformModule": "servicebus_topics_subscriptions_rules",
+                                    "name": "608945df6b9a7372881767fda5311c99c381670a"
+                                }
+                            ]
+                        },
+                        {
+                            "terraformModule": "servicebus_topics_subscriptions",
+                            "name": "to-egs-smt-webhost",
+                            "rules": [
+                                {
+                                    "terraformModule": "servicebus_topics_subscriptions_rules",
+                                    "name": "9057cf5bad990c66ac0bbbb44332f2b03339be30"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "terraformModule": "{{ file.azure1.resourceGroup}}",
+                    "name": "egs-smt-ttime",
+                    "subscriptions": [
+                        {
+                            "terraformModule": "servicebus_topics_subscriptions",
+                            "name": "egs-smt-ttime-sub"
+                        }
+                    ]
+                },
+                {
+                    "terraformModule": "servicebus_topics",
+                    "name": "egs-smt-webhost",
+                    "subscriptions": [
+                        {
+                            "terraformModule": "servicebus_topics_subscriptions",
+                            "name": "egs-smt-webhost-sub"
+                        }
+                    ]
+                },
+                {
+                    "terraformModule": "servicebus_topics",
+                    "name": "sample.telltime"
+                },
+                {
+                    "terraformModule": "servicebus_topics",
+                    "name": "sample.timepassed"
+                }
+            ],
+            "queues": [
+                {
+                    "terraformModule": "servicebus_queues",
+                    "name": "sample.telltime.command"
+                },
+                {
+                    "terraformModule": "servicebus_queues",
+                    "name": "sample.timepassed.command"
+                }
+            ]
+        }
+    }
+}

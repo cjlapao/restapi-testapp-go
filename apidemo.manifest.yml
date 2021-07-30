@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-api-demo
+  namespace: playground
+  labels:
+    app: go-api-demo
+    environment: development
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+  - protocol: TCP
+    name: api
+    port: 10000
+    targetPort: 10000
+  selector:
+    app: go-api-demo
+    environment: development
+  sessionAffinity: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  namespace: playground
+  labels:
+    app: go-api-demo
+    environment: development
+  name: go-api-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-api-demo
+      environment: development
+  template:
+    metadata:
+      labels:
+        app: go-api-demo
+        environment: development
+    spec:
+      containers:
+      - image: cjlapao/go-restapi-demo:latest
+        imagePullPolicy: Always
+        name: go-api-demo
+        resources:
+          requests: {            
+            cpu: "150m",
+            memory: "25Mi"
+          }
+          limits: {
+            cpu: "250m",
+            memory: "50Mi"
+          }
+        ports:
+          - containerPort: 10000
+        env:
+          - name: "mongoConnectionString_TEMP"
+            valueFrom:
+              secretKeyRef:
+                name: azure-secrets
+                key: mongodbConnectionstring
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
