@@ -1,6 +1,6 @@
 package repositories
 
-import "ittech24/rest/apidemo/database"
+import "github.com/cjlapao/restapi-testapp-go/database"
 
 // Collection
 const (

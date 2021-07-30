@@ -2,9 +2,9 @@ package repositories
 
 import (
 	"context"
-	"ittech24/rest/apidemo/entities"
 	"time"
 
+	"github.com/cjlapao/restapi-testapp-go/entities"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

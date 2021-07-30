@@ -1,9 +1,9 @@
 package startup
 
 import (
-	"ittech24/rest/apidemo/executioncontext"
-	"ittech24/rest/apidemo/log"
-	"ittech24/rest/apidemo/version"
+	"github.com/cjlapao/common-go/log"
+	"github.com/cjlapao/common-go/version"
+	"github.com/cjlapao/restapi-testapp-go/executioncontext"
 )
 
 type ServiceProvider struct {

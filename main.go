@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"ittech24/rest/apidemo/bootstrap"
-	"ittech24/rest/apidemo/controller"
-	"ittech24/rest/apidemo/helper"
-	"ittech24/rest/apidemo/log"
-	"ittech24/rest/apidemo/startup"
-	"ittech24/rest/apidemo/version"
 	"os"
 	"strings"
+
+	"github.com/cjlapao/common-go/helper"
+	"github.com/cjlapao/common-go/log"
+	"github.com/cjlapao/common-go/version"
+	"github.com/cjlapao/restapi-testapp-go/controller"
+	"github.com/cjlapao/restapi-testapp-go/startup"
 )
 
 var startupSvc = startup.CreateProvider()
@@ -34,13 +34,8 @@ func main() {
 
 	versionSvc.PrintAnsiHeader()
 
-	bootstrap.Start()
-
 	defer func() {
-		bootstrap.Exit(0)
 	}()
 
 	controller.RestApiModuleProcessor()
-
-	bootstrap.Exit(0)
 }

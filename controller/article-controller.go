@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"ittech24/rest/apidemo/entities"
 	"net/http"
 
+	"github.com/cjlapao/restapi-testapp-go/entities"
 	"github.com/gorilla/mux"
 	"github.com/rs/xid"
 )
@@ -17,7 +17,11 @@ func (c *Controller) GetArticle(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["id"]
 
-	article := c.Repository.GetArticleByID(key)
+	article := entities.Article{}
+	if serviceProvider.Context.BackendEnabled {
+		article = c.Repository.GetArticleByID(key)
+	}
+
 	json.NewEncoder(w).Encode(article)
 }
 
@@ -25,7 +29,10 @@ func (c *Controller) GetArticle(w http.ResponseWriter, r *http.Request) {
 func (c *Controller) GetAllArticles(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Articles GetAll Endpoint Hit")
 
-	articles := c.Repository.GetAllArticles()
+	articles := []entities.Article{}
+	if serviceProvider.Context.BackendEnabled {
+		articles = c.Repository.GetAllArticles()
+	}
 
 	json.NewEncoder(w).Encode(articles)
 }
@@ -39,11 +46,13 @@ func (c *Controller) PostArticle(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &article)
 	article.ID = xid.New().String()
 
-	result := c.Repository.UpsertArticle(article)
-	fmt.Print(result)
-	if result.UpsertedCount == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	if serviceProvider.Context.BackendEnabled {
+		result := c.Repository.UpsertArticle(article)
+		fmt.Print(result)
+		if result.UpsertedCount == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	}
 
 	json.NewEncoder(w).Encode(article)
@@ -65,11 +74,13 @@ func (c *Controller) PutArticle(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &article)
 	article.ID = key
 
-	result := c.Repository.UpdateArticle(article)
+	if serviceProvider.Context.BackendEnabled {
+		result := c.Repository.UpdateArticle(article)
 
-	if result.MatchedCount == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		if result.MatchedCount == 0 {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 	}
 
 	json.NewEncoder(w).Encode(article)

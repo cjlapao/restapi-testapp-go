@@ -1,9 +1,11 @@
 package executioncontext
 
 import (
-	"ittech24/rest/apidemo/helper"
-	"ittech24/rest/apidemo/log"
 	"os"
+	"strings"
+
+	"github.com/cjlapao/common-go/helper"
+	"github.com/cjlapao/common-go/log"
 )
 
 var globalContext *Context
@@ -11,12 +13,12 @@ var logger = log.Get()
 
 // Context entity
 type Context struct {
-	Module                string `json:"module"`
-	Operation             string `json:"operation"`
-	TenantID              string `json:"tenantId"`
 	MongoConnectionString string `json:"mongoConnectionString"`
 	Database              string `json:"database"`
 	ShowHelp              bool   `json:"help"`
+	BackendEnabled        bool   `json:"backendEnabled"`
+	ApiPrefix             string `json:"apiPrefix"`
+	ApiPort               string `json:"apiPort"`
 }
 
 func Get() *Context {
@@ -26,8 +28,7 @@ func Get() *Context {
 
 	logger.Debug("Creating Execution Context")
 	globalContext = &Context{
-		Operation: helper.GetFlagValue("operation", "api"),
-		ShowHelp:  helper.GetFlagSwitch("help", false),
+		ShowHelp: helper.GetFlagSwitch("help", false),
 	}
 
 	globalContext.Getenv()
@@ -38,14 +39,22 @@ func Get() *Context {
 // Getenv gets the environment variables for the entities
 func (e *Context) Getenv() {
 
-	op := os.Getenv("DO_OPERATION")
-	module := os.Getenv("DT_MODULE")
+	e.Database = os.Getenv("RESTAPI_DATABASENAME")
+	e.MongoConnectionString = os.Getenv("RESTAPI_MONGO_CONNECTION_STRING")
+	e.ApiPrefix = os.Getenv("RESTAPI_API_PREFIX")
+	e.ApiPort = os.Getenv("RESTAPI_API_PORT")
 
-	if len(op) > 0 {
-		e.Operation = op
+	if e.MongoConnectionString == "" {
+		e.BackendEnabled = false
+	} else {
+		e.BackendEnabled = true
 	}
 
-	if len(module) > 0 {
-		e.Module = module
+	if e.ApiPort == "" {
+		e.ApiPort = "80"
+	}
+
+	if strings.HasSuffix(e.ApiPrefix, "/") {
+		e.ApiPrefix = strings.TrimSuffix(e.ApiPrefix, "/")
 	}
 }

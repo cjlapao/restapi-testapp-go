@@ -3,10 +3,11 @@ package controller
 import (
 	"encoding/json"
 	"io/ioutil"
-	"ittech24/rest/apidemo/entities"
-	"ittech24/rest/apidemo/log"
-	"ittech24/rest/apidemo/security"
 	"net/http"
+
+	"github.com/cjlapao/common-go/log"
+	"github.com/cjlapao/common-go/security"
+	"github.com/cjlapao/restapi-testapp-go/entities"
 )
 
 // Login Generate a token for a valid user

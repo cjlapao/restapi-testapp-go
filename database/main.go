@@ -1,8 +1,8 @@
 package database
 
 import (
-	"ittech24/rest/apidemo/executioncontext"
-	"ittech24/rest/apidemo/log"
+	"github.com/cjlapao/common-go/log"
+	"github.com/cjlapao/restapi-testapp-go/executioncontext"
 )
 
 var ctx = executioncontext.Get()
