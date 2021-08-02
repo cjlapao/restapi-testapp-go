@@ -21,7 +21,7 @@ func (c *Controller) Login(w http.ResponseWriter, r *http.Request) {
 
 	user := entities.User{
 		Email:    "admin@localhost",
-		Password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+		Password: "18f3c96386407ba486f6f6178a14639194e498c4f8338fc61bf2945653fe058a",
 	}
 	if len(user.Email) == 0 {
 		w.WriteHeader(http.StatusUnauthorized)

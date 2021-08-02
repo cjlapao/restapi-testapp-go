@@ -48,14 +48,16 @@ func NewAPIController(router *mux.Router, repo repositories.Repository) *Control
 		Repository: &repo,
 	}
 
+	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/login", controller.Login).Methods("POST")
+	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/validate", controller.Validate).Methods("GET")
+
 	controller.Router.Handle(serviceProvider.Context.ApiPrefix+"/article", security.AuthenticateMiddleware(controller.GetAllArticles)).Methods("GET")
 	controller.Router.Handle(serviceProvider.Context.ApiPrefix+"/article", security.AuthenticateMiddleware(controller.PostArticle)).Methods("POST")
 	controller.Router.Handle(serviceProvider.Context.ApiPrefix+"/article/{id}", security.AuthenticateMiddleware(controller.GetArticle)).Methods("GET")
 	controller.Router.Handle(serviceProvider.Context.ApiPrefix+"/article/{id}", security.AuthenticateMiddleware(controller.PutArticle)).Methods("PUT")
 	controller.Router.Handle(serviceProvider.Context.ApiPrefix+"/article/{id}", security.AuthenticateMiddleware(controller.DeleteArticle)).Methods("DELETE")
 
-	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/login", controller.Login).Methods("POST")
-	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/validate", controller.Validate).Methods("GET")
+	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/generator", controller.Generator).Methods("GET")
 
 	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/hello", controller.Hello).Methods("GET")
 	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/hello/{name}", controller.Hello).Methods("GET")

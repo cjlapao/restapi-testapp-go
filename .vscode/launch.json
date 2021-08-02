@@ -8,18 +8,17 @@
       "mode": "debug",
       "program": "${workspaceFolder}/main.go",
       "env": {
-        "SERVICEBUS_CONNECTION_STRING": "${input:azureServiceBusConnectionString}"
+        "RESTAPI_MONGO_CONNECTION_STRING": "${input:mongoDbConnectionString}",
+        "RESTAPI_API_PORT": "10000"
       },
-      "args": [
-        "api"
-      ]
+      "args": []
     }
   ],
   "inputs": [
     {
-      "id": "azureServiceBusConnectionString",
+      "id": "mongoDbConnectionString",
       "type": "promptString",
-      "description": "Azure Service Bus Connection String"
+      "description": "MongoDB Connection String"
     }
   ]
 }

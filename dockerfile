@@ -30,6 +30,6 @@ COPY --from=builder /go/bin/demo.json /go/bin
 # RUN ls -la /go/bin
 
 # Run the hello binary.
+EXPOSE 80
 
-EXPOSE 10000
-ENTRYPOINT ["/go/bin/apidemo", "api"]
+ENTRYPOINT ["/go/bin/restapi-testapp-go"]

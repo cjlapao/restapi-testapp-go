@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/cjlapao/restapi-testapp-go/executioncontext"
@@ -34,7 +33,7 @@ func (f *MongoFactory) GetContext() *executioncontext.Context {
 	}
 
 	context := executioncontext.Context{
-		Database: os.Getenv("databaseName"),
+		Database: executioncontext.Get().Database,
 	}
 
 	f.Context = &context
@@ -49,8 +48,8 @@ func (f *MongoFactory) GetClient() *mongo.Client {
 		return f.Client
 	}
 
-	connectionString := os.Getenv("mongoConnectionString")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	connectionString := executioncontext.Get().MongoConnectionString
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionString))
 	if err != nil {

@@ -50,6 +50,10 @@ func (e *Context) Getenv() {
 		e.BackendEnabled = true
 	}
 
+	if e.Database == "" {
+		e.Database = "restapi_demo_db"
+	}
+
 	if e.ApiPort == "" {
 		e.ApiPort = "80"
 	}
