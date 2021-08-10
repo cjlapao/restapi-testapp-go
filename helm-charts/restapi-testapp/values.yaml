@@ -1,0 +1,3 @@
+apiPort: 10000
+serviceAccount:
+  create: false

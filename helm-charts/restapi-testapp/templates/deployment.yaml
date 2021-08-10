@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    namespace: playground
+    labels:
+        app: go-api-demo
+        environment: development
+    name: go-api-demo
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: go-api-demo
+            environment: development
+    template:
+        metadata:
+            labels:
+                app: go-api-demo
+                environment: development
+        spec:
+            containers:
+                - image: cjlapao/go-restapi-demo:latest
+                  imagePullPolicy: Always
+                  name: go-api-demo
+                  resources:
+                      requests: { cpu: '150m', memory: '25Mi' }
+                      limits: { cpu: '250m', memory: '50Mi' }
+                  env:
+                      - name: RESTAPI_API_PORT
+                        value: { { .Values.apiPort } }
+            dnsPolicy: ClusterFirstWithHostNet
+            restartPolicy: Always

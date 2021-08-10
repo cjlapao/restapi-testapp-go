@@ -11,64 +11,13 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "*.local-build.co"
+    - "*.local-cluster.internal"
   - port:
       number: 443
       name: tls
       protocol: HTTP
     hosts:
-    - "*.local-build.co"
----
-apiVersion: networking.istio.io/v1alpha3
-kind: ServiceEntry
-metadata:
-  name: localdev-team-dependencies
-spec:
-  hosts:
-  - playground.localdev.team
-  ports:
-  - number: 80
-    name: http
-    protocol: HTTP
-  - number: 443
-    name: tls
-    protocol: TLS
-  resolution: DNS
-  location: MESH_EXTERNAL
----
-apiVersion: networking.istio.io/v1alpha3
-kind: ServiceEntry
-metadata:
-  name: saas-testarossa-dependencies
-spec:
-  hosts:
-  - saas-testarossa-api.ivanticlouddev.com
-  ports:
-  - number: 80
-    name: http
-    protocol: HTTP
-  - number: 443
-    name: tls
-    protocol: TLS
-  resolution: DNS
-  location: MESH_EXTERNAL
----
-apiVersion: networking.istio.io/v1alpha3
-kind: ServiceEntry
-metadata:
-  name: swapi-dev-dependencies
-spec:
-  hosts:
-  - swapi.dev
-  ports:
-  - number: 80
-    name: http
-    protocol: HTTP
-  - number: 443
-    name: tls
-    protocol: TLS
-  resolution: DNS
-  location: MESH_EXTERNAL
+    - "*.local-cluster.internal"
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -76,93 +25,16 @@ metadata:
   name: api-gateway-forwarding-poc
 spec:
   hosts:
-  - "*.local-build.co"
+  - "test.local-cluster.internal"
   gateways:
   - proxy
   http:
   - match:
-    - gateways:
-      - proxy
-      port: 80
-      uri:
-        prefix: /outside-auth
-    rewrite:
-      uri: /auth/hello
-      authority: playground.localdev.team
-    route:
-    - destination:
-        host: playground.localdev.team
-        port:
-          number: 80
-  - match:
-    - gateways:
-      - proxy
-      port: 80
-      uri:
-        prefix: /hello
-    route:
-    - destination:
-        host: go-api-demo.playground.svc.cluster.local
-        port:
-          number: 10000
-  - match:
-    - gateways:
-      - proxy
-      port: 80
-      uri:
-        prefix: /auth
-    route:
-    - destination:
-        host: go-api-demo.playground.svc.cluster.local
-        port:
-          number: 10000
-  - match:
-    - gateways:
-      - proxy
-      port: 80
-      uri:
-        prefix: /login
-    route:
-    - destination:
-        host: go-api-demo.playground.svc.cluster.local
-        port:
-          number: 10000
-  - match:
-    - gateways:
-      - proxy
-      port: 80
-      uri:
-        prefix: /outside
-    rewrite:
-      uri: /hello
-      authority: playground.localdev.team
-    route:
-    - destination:
-        host: playground.localdev.team
-        port:
-          number: 80
-  - match:
-    - gateways:
-      - proxy
-      port: 80
-      uri:
-        prefix: /starwars
-    rewrite:
-      uri: /api
-      authority: swapi.dev
-    route:
-    - destination:
-        host: swapi.dev
-  - match:
-    - gateways:
-      - proxy
-      port: 80
+    - port: 80
       uri:
         prefix: /
-    rewrite:
-      authority: saas-testarossa-api.ivanticlouddev.com
     route:
     - destination:
-        host: saas-testarossa-api.ivanticlouddev.com
+        host: go-api-demo.playground.svc.cluster.local
         port:
           number: 80
