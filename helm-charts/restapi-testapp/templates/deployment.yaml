@@ -1,32 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    namespace: playground
-    labels:
-        app: go-api-demo
-        environment: development
-    name: go-api-demo
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "restapi-testapp.labels" . | nindent 4 }}
+  name: {{ include "restapi-testapp.fullname" .}}
 spec:
-    replicas: 1
-    selector:
-        matchLabels:
-            app: go-api-demo
-            environment: development
-    template:
-        metadata:
-            labels:
-                app: go-api-demo
-                environment: development
-        spec:
-            containers:
-                - image: cjlapao/go-restapi-demo:latest
-                  imagePullPolicy: Always
-                  name: go-api-demo
-                  resources:
-                      requests: { cpu: '150m', memory: '25Mi' }
-                      limits: { cpu: '250m', memory: '50Mi' }
-                  env:
-                      - name: RESTAPI_API_PORT
-                        value: { { .Values.apiPort } }
-            dnsPolicy: ClusterFirstWithHostNet
-            restartPolicy: Always
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+    {{- include "restapi-testapp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "restapi-testapp.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - image: cjlapao/go-restapi-demo:latest
+          imagePullPolicy: Always
+          name: go-api-demo
+          resources:
+            requests: {cpu: "150m", memory: "25Mi"}
+            limits: {cpu: "250m", memory: "50Mi"}
+          env:
+            - name: RESTAPI_API_PORT
+              value: {{ .Values.apiPort | quote }}
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always

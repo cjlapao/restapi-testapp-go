@@ -1,40 +1,46 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-        {
-            "type": "npm",
-            "script": "build:docker",
-            "group": "build",
-            "isBackground": true,
-            "presentation": {
-              "echo": true,
-              "reveal": "silent",
-              "focus": false,
-              "panel": "shared",
-              "showReuseMessage": true,
-              "clear": false
-            },
-            "problemMatcher": [],
-            "label": "npm: build:docker",
-            "detail": "docker build --tag cjlapao/deployment-tools:latest .",
-          },
-          {
-            "type": "npm",
-            "script": "publish:docker",
-            "group": "build",
-            "isBackground": true,
-            "presentation": {
-              "echo": true,
-              "reveal": "silent",
-              "focus": false,
-              "panel": "shared",
-              "showReuseMessage": true,
-              "clear": false
-            },
-            "problemMatcher": [],
-            "label": "npm: publish:docker",
-            "detail": "docker push cjlapao/deployment-tools:latest",
-            "dependsOn": ["npm: build:docker"]
-          }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "command": "docker build --tag cjlapao/go-restapi-demo:latest .",
+      "windows": {
+        "command": "docker build --tag cjlapao/go-restapi-demo:latest .",
+      },
+      "problemMatcher": [],
+      "label": "build:docker"
+    },
+    {
+      "type": "shell",
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "command": "docker push cjlapao/go-restapi-demo:latest",
+      "windows": {
+        "command": "docker push cjlapao/go-restapi-demo:latest",
+      },
+      "label": "publish:docker",
+      "dependsOn": [
+        "build:docker"
+      ]
+    }
+  ]
 }

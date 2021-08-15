@@ -1,0 +1,22 @@
+{{ $namespace := .Values.namespace.name }}
+{{ $fullname := include "restapi-testapp.fullname" .}}
+{{ if .Values.ingress.virtualService.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "restapi-testapp.fullname" .}}
+  labels: {{ include "restapi-testapp.labels" . | nindent 4}}
+spec:
+  hosts:
+  - {{ .Values.ingress.host }}
+  http:
+  {{ range $value := .Values.ingress.paths}}
+  - name: {{ .name }}
+    match:
+    - uri:
+        prefix: {{ .route }}
+    route:
+    - destination:
+        host: {{$fullname}}.{{$namespace}}.svc.cluster.local
+{{ end }}
+{{ end }}

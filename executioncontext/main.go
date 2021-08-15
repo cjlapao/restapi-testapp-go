@@ -42,8 +42,7 @@ func (e *Context) Getenv() {
 	e.Database = os.Getenv("RESTAPI_DATABASENAME")
 	e.MongoConnectionString = os.Getenv("RESTAPI_MONGO_CONNECTION_STRING")
 	e.ApiPrefix = os.Getenv("RESTAPI_API_PREFIX")
-	e.ApiPort = os.Getenv("
-	")
+	e.ApiPort = os.Getenv("RESTAPI_API_PORT")
 
 	if e.MongoConnectionString == "" {
 		e.BackendEnabled = false
