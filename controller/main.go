@@ -1,10 +1,15 @@
 package controller
 
 import (
+	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/signal"
+	"time"
 
 	"net/http"
 
@@ -85,13 +90,61 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests() {
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+
 	router := mux.NewRouter().StrictSlash(true)
 	router.Use(commonMiddleware)
 	router.HandleFunc(serviceProvider.Context.ApiPrefix+"/", homePage)
 	_ = NewAPIController(router, repo)
-	logger.Info("Api listening on http://localhost:" + serviceProvider.Context.ApiPort + serviceProvider.Context.ApiPrefix)
-	logger.Success("Finished Init")
-	log.Fatal(http.ListenAndServe(":"+serviceProvider.Context.ApiPort, router))
+
+	// Creating and starting the http server
+	srv := &http.Server{
+		Addr:    ":" + serviceProvider.Context.ApiPort,
+		Handler: router,
+	}
+
+	go func() {
+		logger.Info("Api listening on http://localhost:" + serviceProvider.Context.ApiPort + serviceProvider.Context.ApiPrefix)
+		logger.Success("Finished Initiating http server")
+		if err := srv.ListenAndServe(); err != nil {
+			logger.FatalError(err, "There was an error")
+		}
+	}()
+
+	if serviceProvider.Context.TLS {
+		cert, err := tls.X509KeyPair([]byte(serviceProvider.Context.TLSCertificate), []byte(serviceProvider.Context.TLSPrivateKey))
+		if err == nil {
+			tlsConfig := &tls.Config{
+				Certificates: []tls.Certificate{cert},
+			}
+
+			sslSrv := &http.Server{
+				Addr:      ":" + serviceProvider.Context.TLSApiPort,
+				TLSConfig: tlsConfig,
+				Handler:   router,
+			}
+
+			go func() {
+				logger.Info("Api listening on https://localhost:" + serviceProvider.Context.TLSApiPort + serviceProvider.Context.ApiPrefix)
+				logger.Success("Finished Initiating https server")
+				if err := sslSrv.ListenAndServeTLS("", ""); err != nil {
+					logger.FatalError(err, "There was an error")
+				}
+			}()
+		} else {
+			logger.Error("There was an error reading the certificates to enable HTTPS")
+		}
+	}
+
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal(err)
+	}
+	logger.Info("Server shutdown")
+	// http.ListenAndServeTLS(":10001", "./ssl/local-cluster.internal.crt", "./ssl/local-cluster.internal.key", router)
 }
 
 func commonMiddleware(next http.Handler) http.Handler {

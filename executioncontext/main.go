@@ -1,6 +1,7 @@
 package executioncontext
 
 import (
+	"encoding/base64"
 	"os"
 	"strings"
 
@@ -19,6 +20,10 @@ type Context struct {
 	BackendEnabled        bool   `json:"backendEnabled"`
 	ApiPrefix             string `json:"apiPrefix"`
 	ApiPort               string `json:"apiPort"`
+	TLS                   bool   `json:"tls"`
+	TLSApiPort            string `json:"tlsApiPort"`
+	TLSCertificate        string `json:"tlsCertificate"`
+	TLSPrivateKey         string `json:"tlsPrivateKey"`
 }
 
 func Get() *Context {
@@ -43,6 +48,22 @@ func (e *Context) Getenv() {
 	e.MongoConnectionString = os.Getenv("RESTAPI_MONGO_CONNECTION_STRING")
 	e.ApiPrefix = os.Getenv("RESTAPI_API_PREFIX")
 	e.ApiPort = os.Getenv("RESTAPI_API_PORT")
+	e.TLS = false
+	e.TLSApiPort = os.Getenv("RESTAPI_TLS_API_PORT")
+
+	if os.Getenv("RESTAPI_TLS") != "" && strings.ToLower(os.Getenv("RESTAPI_TLS")) == "true" {
+		e.TLS = true
+	}
+
+	if os.Getenv("RESTAPI_TLS_CERTIFICATE") != "" {
+		decodedCert, _ := base64.StdEncoding.DecodeString(os.Getenv("RESTAPI_TLS_CERTIFICATE"))
+		e.TLSCertificate = string(decodedCert)
+	}
+
+	if os.Getenv("RESTAPI_TLS_PRIVATE_KEY") != "" {
+		decodedPrivateKey, _ := base64.StdEncoding.DecodeString(os.Getenv("RESTAPI_TLS_PRIVATE_KEY"))
+		e.TLSPrivateKey = string(decodedPrivateKey)
+	}
 
 	if e.MongoConnectionString == "" {
 		e.BackendEnabled = false
@@ -58,7 +79,14 @@ func (e *Context) Getenv() {
 		e.ApiPort = "80"
 	}
 
-	if strings.HasSuffix(e.ApiPrefix, "/") {
-		e.ApiPrefix = strings.TrimSuffix(e.ApiPrefix, "/")
+	if e.TLSApiPort == "" {
+		e.TLSApiPort = "443"
 	}
+
+	// if the tls is enabled but no certificate or private key then we will disable it
+	if e.TLSCertificate == "" || e.TLSPrivateKey == "" {
+		e.TLS = false
+	}
+
+	e.ApiPrefix = strings.TrimSuffix(e.ApiPrefix, "/")
 }
