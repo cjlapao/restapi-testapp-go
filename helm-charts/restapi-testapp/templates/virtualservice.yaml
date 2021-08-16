@@ -1,16 +1,19 @@
 {{ $namespace := .Values.namespace.name }}
 {{ $fullname := include "restapi-testapp.fullname" .}}
-{{ if .Values.ingress.virtualService.enabled }}
+{{ if and (eq .Values.ingress.ingressClass "istio") (.Values.ingress.enabled) }}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: {{ include "restapi-testapp.fullname" .}}
   labels: {{ include "restapi-testapp.labels" . | nindent 4}}
 spec:
+  gateways:
+  - {{ .Values.ingress.gateway }}
   hosts:
-  - {{ .Values.ingress.host }}
+  {{- range $host := .Values.ingress.hosts }}
+  - {{ $host.host }}
   http:
-  {{ range $value := .Values.ingress.paths}}
+  {{- range $path := $host.paths }}
   - name: {{ .name }}
     match:
     - uri:
@@ -18,5 +21,6 @@ spec:
     route:
     - destination:
         host: {{$fullname}}.{{$namespace}}.svc.cluster.local
-{{ end }}
+{{- end }}
+{{- end }}
 {{ end }}

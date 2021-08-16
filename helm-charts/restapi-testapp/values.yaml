@@ -14,10 +14,12 @@ autoscaling:
   targetCPUUtilizationPercentage: 30
   targetMemoryUtilizationPercentage: 75
 ingress:
+  enabled: true
+  ingressClass: istio
+  gateway: proxy
   tls: true
-  host: 'test.local-cluster.internal'
-  paths:
-    - name: "hello"
-      route: "/hello"
-  virtualService:
-    enabled: true
+  hosts: 
+    - host: 'test.local-cluster.internal'
+      paths:
+        - name: "hello"
+          route: "/hello"
