@@ -1,5 +1,6 @@
 {{ $namespace := .Values.namespace.name }}
 {{ $fullname := include "restapi-testapp.fullname" .}}
+{{ $routePrefix := .Values.ingress.routePrefix }}
 {{ if and (eq .Values.ingress.ingressClass "istio") (.Values.ingress.enabled) }}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -17,7 +18,7 @@ spec:
   - name: {{ .name }}
     match:
     - uri:
-        prefix: {{ .route }}
+        prefix: {{if not (hasPrefix "/" $routePrefix) }}/{{end}}{{ $routePrefix }}/{{ .route }}
     route:
     - destination:
         host: {{$fullname}}.{{$namespace}}.svc.cluster.local

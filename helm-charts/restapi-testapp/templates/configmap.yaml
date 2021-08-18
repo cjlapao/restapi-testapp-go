@@ -1,0 +1,10 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "restapi-testapp.fullname" . }}
+  namespace: {{ .Values.namespace.name }}
+data:
+  API_PORT: {{ .Values.ports.http | quote }}
+  TLS_API_PORT: {{ .Values.ports.tls | quote }}
+  TLS: {{ .Values.ports.tlsEnabled | quote }}
+  API_PREFIX: {{ .Values.ingress.routePrefix |quote }}
