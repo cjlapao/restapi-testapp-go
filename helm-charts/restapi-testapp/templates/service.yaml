@@ -10,8 +10,14 @@ spec:
   type: {{.Values.service.type}}
   ports:
     - protocol: TCP
-      name: api
-      port: {{.Values.service.port}}
-      targetPort: {{.Values.apiPort}}
+      name: api-http
+      port: {{.Values.service.http}}
+      targetPort: {{.Values.ports.http}}
+    {{- if .Values.ports.tlsEnabled }}
+    - protocol: TCP
+      name: api-tls
+      port: {{.Values.service.tls}}
+      targetPort: {{.Values.ports.tls}}
+    {{- end }}
   selector: {{- include "restapi-testapp.selectorLabels" . | nindent 4}}
   sessionAffinity: None

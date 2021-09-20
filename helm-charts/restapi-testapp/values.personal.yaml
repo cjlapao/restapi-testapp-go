@@ -3,27 +3,27 @@ service:
   http: 80
   tls: 443
 ports:
-  tlsEnabled: true
   http: 10000
   tls: 10001
 namespace:
   create: true
-  name: demo
+  name: debug
 serviceAccount:
   create: true
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 2
   maxReplicas: 5
   targetCPUUtilizationPercentage: 30
   targetMemoryUtilizationPercentage: 75
+tlsEnabled: false
 ingress:
   enabled: true
   ingressClass: 'istio'
-  gateway: 'proxy'
+  gateway: 'ivanticloud-default-gateway'
   routePrefix: '/api'
   hosts: 
-    - host: 'test.local-cluster.internal'
+    - host: 'testarossa-sfc.ivanticlouddev.com'
       paths:
         - name: "hello-world"
           route: "hello"

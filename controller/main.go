@@ -66,8 +66,12 @@ func NewAPIController(router *mux.Router, repo repositories.Repository) *Control
 
 	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/hello", controller.Hello).Methods("GET")
 	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/hello/{name}", controller.Hello).Methods("GET")
+	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/banana/{name}", controller.Hello).Methods("GET")
+	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/status/{name}", controller.Hello).Methods("GET")
 	controller.Router.Handle(serviceProvider.Context.ApiPrefix+"/auth/hello", security.AuthenticateMiddleware(controller.Hello)).Methods("GET")
 	controller.Router.Handle(serviceProvider.Context.ApiPrefix+"/auth/hello/{name}", security.AuthenticateMiddleware(controller.Hello)).Methods("GET")
+
+	controller.Router.HandleFunc(serviceProvider.Context.ApiPrefix+"/debug", controller.Debug).Methods("GET")
 
 	globalController = &controller
 	return globalController

@@ -26,6 +26,14 @@ spec:
             limits: {cpu: "250m", memory: "50Mi"}
           env:
             - name: RESTAPI_API_PORT
-              value: {{ .Values.ports.http | quote }}              
+              value: {{ .Values.ports.http | quote }}
+            - name: RESTAPI_API_PREFIX
+              value: {{ .Values.ingress.routePrefix | quote }}
+            {{- if .Values.ports.tlsEnabled }}
+            - name: RESTAPI_TLS_API_PORT
+              value: {{ .Values.ports.tls | quote }}        
+            - name: RESTAPI_TLS_API_PORT
+              value: {{ .Values.ports.tls | quote }}        
+            {{- end }}
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
