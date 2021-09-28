@@ -1,15 +1,21 @@
 {{ $namespace := .Values.namespace.name }}
 {{ $fullname := include "restapi-testapp.fullname" .}}
 {{ $routePrefix := .Values.ingress.routePrefix }}
+{{ $serviceHttpPort := .Values.service.http }}
 {{ if and (eq .Values.ingress.ingressClass "istio") (.Values.ingress.enabled) }}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: {{ include "restapi-testapp.fullname" .}}
   labels: {{ include "restapi-testapp.labels" . | nindent 4}}
+  namespace: {{ .Values.namespace.name }}
 spec:
   gateways:
+  {{- if .Values.ingress.gatewayNamespace }}
+  - {{ .Values.ingress.gatewayNamespace }}/{{ .Values.ingress.gateway }}
+  {{- else }}
   - {{ .Values.ingress.gateway }}
+  {{- end}}
   hosts:
   {{- range $host := .Values.ingress.hosts }}
   - {{ $host.host }}
@@ -22,7 +28,8 @@ spec:
     route:
     - destination:
         host: {{$fullname}}.{{$namespace}}.svc.cluster.local
-
+        port:
+          number: {{ $serviceHttpPort }}
 {{- end }}
 {{- end }}
 {{ end }}

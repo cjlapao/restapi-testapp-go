@@ -21,6 +21,7 @@ ingress:
   enabled: true
   ingressClass: 'istio'
   gateway: 'proxy'
+  gatewayNamespace: 'istio-system'
   routePrefix: '/api'
   hosts: 
     - host: 'test.local-cluster.internal'

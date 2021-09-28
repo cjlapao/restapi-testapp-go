@@ -21,6 +21,7 @@ ingress:
   enabled: true
   ingressClass: 'istio'
   gateway: 'ivanticloud-default-gateway'
+  gatewayNamespace: 'istio-system'
   routePrefix: '/api'
   hosts: 
     - host: 'testarossa-sfc.ivanticlouddev.com'
